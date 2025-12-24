@@ -1,0 +1,163 @@
+
+<app-universal-spinner [show]="loading"></app-universal-spinner>
+
+
+<div class="form-wrapper" *ngIf="!loading">
+  <form #regForm="ngForm" (ngSubmit)="onSubmit(regForm)">
+    <h1>Register Here</h1>
+
+    <!-- First Name -->
+    <div class="form-group">
+      <label for="firstName">First Name <span class="required-asterisk">*</span></label>
+      <input
+        type="text"
+        id="firstName"
+        name="firstName"
+        [(ngModel)]="formData.firstName"
+        required
+        pattern="^[A-Za-z]+$"
+        #firstName="ngModel"
+        class="form-control"
+        placeholder="Enter first name"
+      />
+      <div *ngIf="firstName.invalid && firstName.touched" class="error">
+        First name is required and must contain only letters.
+      </div>
+    </div>
+
+    <!-- Last Name -->
+    <div class="form-group">
+      <label for="lastName">Last Name <span class="required-asterisk">*</span></label>
+      <input
+        type="text"
+        id="lastName"
+        name="lastName"
+        [(ngModel)]="formData.lastName"
+        required
+        pattern="^[A-Za-z]+$"
+        #lastName="ngModel"
+        class="form-control"
+        placeholder="Enter last name"
+      />
+      <div *ngIf="lastName.invalid && lastName.touched" class="error">
+        Last name is required and must contain only letters.
+      </div>
+    </div>
+
+    <!-- Skills -->
+    <div class="form-group">
+      <label>Skills <span class="required-asterisk">*</span></label>
+      <div class="checkbox-group">
+        <label *ngFor="let skill of skills">
+          <input
+            type="checkbox"
+            [value]="skill"
+            (change)="updateSelection(skill, 'skills', $event.target.checked)"
+          />
+          {{ skill }}
+        </label>
+      </div>
+      <input
+        type="text"
+        class="form-control"
+        [value]="formData.skills.join(', ')"
+        readonly
+        placeholder="Selected skills"
+      />
+    </div>
+
+    <!-- Availability -->
+    <div class="form-group">
+      <label>Availability <span class="required-asterisk">*</span></label>
+      <div class="checkbox-group">
+        <label *ngFor="let day of daysOfWeek">
+          <input
+            type="checkbox"
+            [value]="day"
+            (change)="updateSelection(day, 'availability', $event.target.checked)"
+          />
+          {{ day }}
+        </label>
+      </div>
+      <input
+        type="text"
+        class="form-control"
+        [value]="formData.availability.join(', ')"
+        readonly
+        placeholder="Selected days"
+      />
+    </div>
+
+    <!-- Email -->
+    <div class="form-group">
+      <label for="email">Email <span class="required-asterisk">*</span></label>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        [(ngModel)]="formData.email"
+        required
+        email
+        pattern=".+@fleet\.com$"
+        #email="ngModel"
+        class="form-control"
+        placeholder="Enter email ending with @fleet.com"
+      />
+      <div *ngIf="email.invalid && email.touched" class="error">
+        A valid email ending with @fleet.com is required.
+      </div>
+    </div>
+
+    <!-- Password -->
+    <div class="form-group">
+      <label for="password">Password <span class="required-asterisk">*</span></label>
+      <div class="password-wrapper">
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          id="password"
+          name="password"
+          [(ngModel)]="formData.password"
+          required
+          minlength="8"
+          #password="ngModel"
+          class="form-control"
+          placeholder="Enter password"
+        />
+        <button type="button" class="toggle-password" (click)="togglePasswordVisibility()">
+          <i class="fa" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+        </button>
+      </div>
+      <div *ngIf="password.invalid && password.touched" class="error">
+        Password must be at least 6 characters long.
+      </div>
+    </div>
+
+    <!-- Confirm Password -->
+    <div class="form-group">
+      <label for="confirmPassword">Confirm Password <span class="required-asterisk">*</span></label>
+      <div class="password-wrapper">
+        <input
+          [type]="showConfirmPassword ? 'text' : 'password'"
+          id="confirmPassword"
+          name="confirmPassword"
+          [(ngModel)]="formData.confirmPassword"
+          required
+          #confirmPassword="ngModel"
+          class="form-control"
+          placeholder="Confirm your password"
+        />
+        <button type="button" class="toggle-password" (click)="toggleConfirmPasswordVisibility()">
+          <i class="fa" [ngClass]="showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+        </button>
+      </div>
+      <div
+        *ngIf="formData.password !== formData.confirmPassword && confirmPassword.touched"
+        class="error"
+      >
+        Passwords do not match.
+      </div>
+    </div>
+
+    <button type="submit" [disabled]="regForm.invalid" class="submit-btn">Register</button>
+  </form>
+</div>

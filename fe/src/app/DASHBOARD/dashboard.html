@@ -1,0 +1,56 @@
+<app-universal-spinner [show]="loading"></app-universal-spinner>
+<div class="dashboard" *ngIf="!loading">
+  <!-- Total Vehicles -->
+  <div class="card">
+    <div class="icon">
+      <i class="fa-solid fa-2xl fa-car"></i>
+    </div>
+    <h3>Total Vehicles</h3>
+    <p>{{ stats[0]?.count }}</p>
+  </div>
+
+  <!-- Scheduled Services -->
+  <div class="card">
+    <div class="icon">
+      <i class="fa-2xl fa-solid fa-calendar-check" style="color: green"></i>
+    </div>
+    <h3>Scheduled Services</h3>
+    <p>{{ stats[1]?.count }}</p>
+  </div>
+
+  <!-- In Progress -->
+  <div class="card">
+    <div class="icon">
+      <i class="fa-2xl fa-solid fa-spinner" style="color: orangered"></i>
+    </div>
+    <h3>In Progress</h3>
+    <p>{{ stats[2]?.count }}</p>
+  </div>
+
+  <!-- Completed -->
+  <div class="card">
+    <div class="icon">
+      <i class="fa-2xl fa-solid fa-check-circle" style="color: green"></i>
+    </div>
+    <h3>Completed</h3>
+    <p>{{ stats[3]?.count }}</p>
+  </div>
+
+  <!-- Busy Technicians -->
+  <div class="card">
+    <div class="icon">
+      <i class="fa-2xl fa-solid fa-user-clock" style="color: black"></i>
+    </div>
+    <h3>Busy Technicians</h3>
+    <p>{{ stats[4]?.count }}</p>
+  </div>
+
+  <!-- Total Technicians -->
+  <div class="card">
+    <div class="icon">
+      <i class="fa-2xl fa-solid fa-users"></i>
+    </div>
+    <h3>Total Technicians</h3>
+    <p>{{ stats[5]?.count }}</p>
+  </div>
+</div>

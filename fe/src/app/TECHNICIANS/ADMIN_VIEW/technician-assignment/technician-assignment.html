@@ -1,0 +1,113 @@
+<app-universal-spinner [show]="loading"></app-universal-spinner>
+
+<div class="technician-container" *ngIf="!loading">
+  <h2>Technician Assignment Panel</h2>
+  <div class="action-buttons">
+    <button
+      type="button"
+      (click)="showView('assignTask')"
+      [class.active]="currentView === 'assignTask'"
+    >
+      Assign Task
+    </button>
+    <button
+      type="button"
+      (click)="showView('showList')"
+      [class.active]="currentView === 'showList'"
+    >
+      Show Assignment List
+    </button>
+  </div>
+  <!-- Assign Task Form -->
+  <div *ngIf="currentView === 'assignTask'" class="form-container">
+    <h3>Assign Technician to Service</h3>
+    <form #assignmentForm="ngForm" (ngSubmit)="onAssignTask(assignmentForm)">
+      <div class="form-group">
+        <label for="serviceId">Service ID</label>
+        <select
+          id="serviceId"
+          name="serviceId"
+          required
+          [(ngModel)]="newAssignment._id"
+          (change)="onServiceIdChange()"
+          #serviceId="ngModel"
+        >
+          <option [ngValue]="undefined" disabled>Select a service</option>
+          <option *ngFor="let service of unassignedServicesList" [ngValue]="service._id">
+            {{ service._id }} - {{ service.serviceType }}
+          </option>
+        </select>
+        <div *ngIf="serviceId.invalid && serviceId.touched" class="error-text">
+          Service ID is required.
+        </div>
+      </div>
+      <!-- Technician Name -->
+      <div class="form-group">
+        <label for="technicianName">Technician</label>
+        <input
+          id="technicianName"
+          name="technicianName"
+          type="text"
+          [value]="selectedTechnicianName"
+          readonly
+          class="form-control"
+        />
+      </div>
+      <div class="form-group checkbox-group">
+        <label>
+          <input type="checkbox" [(ngModel)]="isTaskConfirmed" name="confirmAssign" required />
+          Confirm Assignment
+        </label>
+        <div *ngIf="!isTaskConfirmed && assignmentForm.submitted" class="error-text">
+          You must confirm the assignment.
+        </div>
+      </div>
+      <button type="submit" [disabled]="assignmentForm.invalid || !isTaskConfirmed">
+        Assign Task
+      </button>
+    </form>
+  </div>
+  <div *ngIf="currentView === 'showList'" class="table-container">
+    <h3 style="text-align: center">Current Service Assignments</h3>
+    <table>
+      <thead>
+        <tr>
+          <!-- <th>Service ID</th> -->
+          <th>Vehicle ID</th>
+          <th>Technician Name</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let assignment of paginatedAssignments">
+          <!-- <td>{{ assignment._id }}</td> -->
+          <td>{{ assignment.vehicleVIN }}</td>
+
+          <td>{{ assignment.technicianName }}</td>
+          <td>{{ assignment.status | formatStatus }}</td>
+        </tr>
+        <tr *ngIf="assignments.length === 0">
+          <td colspan="5">No assignments found.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <nav aria-label="Page navigation" *ngIf="totalPages > 1 && currentView === 'showList'">
+    <ul class="pagination justify-content-center">
+      <!-- Previous -->
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <a class="page-link" (click)="currentPage = currentPage - 1">Previous</a>
+      </li>
+
+      <!-- Page Numbers -->
+      <li class="page-item" *ngFor="let page of pages" [class.active]="currentPage === page">
+        <a class="page-link" (click)="currentPage = page">{{ page }}</a>
+      </li>
+
+      <!-- Next -->
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <a class="page-link" (click)="currentPage = currentPage + 1">Next</a>
+      </li>
+    </ul>
+  </nav>
+</div>

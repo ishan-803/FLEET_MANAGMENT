@@ -1,0 +1,158 @@
+<app-universal-spinner [show]="loading"></app-universal-spinner>
+
+<div class="container mt-4" *ngIf="!loading">
+  <!-- Heading Section -->
+  <div class="section-box">
+    <h2 style="text-align: center">Service Scheduling</h2>
+    <p class="text-muted" style="text-align: center;">
+      Schedule maintenance services by connecting vehicles with available technicians.
+    </p>
+  </div>
+
+  <!-- Summary Cards Section -->
+  <div class="section-box full-width">
+    <div class="row card-row">
+      <div class="col-md-4">
+        <div class="card text-center">
+          <div class="card-body">
+            <h5>Available Vehicles</h5>
+            <p class="fs-4">{{ availableVehicles.length }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card text-center">
+          <div class="card-body">
+            <h5>Available Technicians Today</h5>
+            <p class="fs-4">{{ availableTechniciansCount }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card text-center">
+          <div class="card-body">
+            <h5>Services</h5>
+            <p class="fs-4">{{ scheduledServices.length }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Schedule Form Section -->
+  <div class="section-box narrow-center">
+    <h4 style="text-align: center">Schedule New Service</h4>
+    <form [formGroup]="scheduleForm" (ngSubmit)="submitService()" class="mb-4">
+      <div class="row">
+        <div class="col-md-3 mb-3">
+          <label>Select Vehicle <span class="required-asterisk">*</span></label>
+          <select
+            class="form-select"
+            formControlName="vin"
+            (change)="vehicleChanged($any($event.target).value)"
+          >
+            <option [ngValue]="null" disabled>Select a vehicle</option>
+            <option *ngFor="let v of availableVehicles" [value]="v.VIN">
+              {{ v.VIN }} - {{ v.make }} {{ v.model }}
+            </option>
+          </select>
+        </div>
+        <div class="col-md-3 mb-3">
+          <label>Assign Technician <span class="required-asterisk">*</span></label>
+          <select class="form-select" formControlName="technician">
+            <option [ngValue]="null" disabled>Select an available technician</option>
+            <option
+              *ngFor="let t of techniciansForDropdown"
+              [value]="t.name"
+              [disabled]="!t.isSelectable"
+            >
+              {{ t.name }}
+            </option>
+          </select>
+        </div>
+        <div class="col-md-3 mb-3">
+          <label>Service Type <span class="required-asterisk">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="serviceType"
+            placeholder="Auto-filled from technician"
+            readonly
+          />
+        </div>
+        <div class="col-md-3 mb-3">
+          <label>Due Date <span class="required-asterisk">*</span></label>
+          <input type="date" class="form-control" [min]="minDate" formControlName="dueDate" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3 mb-3">
+          <label>Next Service Mileage <span class="required-asterisk">*</span></label>
+          <input type="text" class="form-control" [value]="nextServiceKmDisplay" readonly />
+        </div>
+        <div class="col-md-3 mb-3">
+          <label>Next Service Date <span class="required-asterisk">*</span></label>
+          <input type="date" class="form-control" [value]="nextServiceDateDisplay" readonly />
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary" [disabled]="scheduleForm.invalid">
+        Schedule
+      </button>
+    </form>
+  </div>
+
+  <!-- Scheduled Services List Section -->
+  <div class="section-box full-width table-responsive">
+    <h4>Services</h4>
+    <table class="table table-bordered table-hover">
+      <thead class="table-light">
+        <tr>
+          <!-- <th>ServiceId</th> -->
+          <th>Vehicle</th>
+          <th>Technician</th>
+          <th>Service Type</th>
+          <th>Due Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let service of scheduledServices">
+          <!-- <td>{{ service._id }}</td> -->
+          <td>{{ service.vehicleVIN }}</td>
+          <td>{{ service.technicianName || 'No technician assigned' }}</td>
+          <td>{{ service.serviceType }}</td>
+          <td>
+            {{ service?.dueServiceDate ? `${service?.dueServiceDate | date}` : "Not assigned"}}
+            <!-- {{
+              
+              service.payment?.paymentStatus === 'Paid'
+                ? 'Completed'
+                : 'Not Completed'
+            }} -->
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <nav aria-label="Page navigation" *ngIf="totalPages > 1">
+      <ul class="pagination justify-content-center">
+        <!-- Previous -->
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <a class="page-link" (click)="currentPage = currentPage - 1">Previous</a>
+        </li>
+
+        <!-- Page Numbers -->
+        <li class="page-item" *ngFor="let page of pages" [class.active]="currentPage === page">
+          <a class="page-link" (click)="currentPage = page">{{ page }}</a>
+        </li>
+
+        <!-- Next -->
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <a class="page-link" (click)="currentPage = currentPage + 1">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Pagination css -->
+</div>

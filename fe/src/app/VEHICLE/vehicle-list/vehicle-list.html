@@ -1,0 +1,131 @@
+<!-- Search Bar -->
+<div class="search-bar">
+  <input
+    [(ngModel)]="searchQuery"
+    (input)="currentPage = 1"
+    class="search-input"
+    placeholder="Search vehicles..."
+  />
+
+  <button class="search-btn"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+</div>
+<!-- Fleet Table -->
+<div class="fleet-table">
+  <table>
+    <thead class="table-dark">
+      <tr>
+        <th>Type</th>
+        <th>Make</th>
+        <th>Model</th>
+        <th>Year</th>
+        <th>VIN</th>
+        <th>Last Service</th>
+        <th>Next Service Mileage</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngIf="vehicles.length === 0">
+        <td colspan="10" class="text-center text-muted py-3">
+          <i class="fa-solid fa-circle-info me-2"></i> No data available at the moment
+        </td>
+      </tr>
+      <tr *ngFor="let vehicle of paginatedVehicles">
+        <td>{{ vehicle.type }}</td>
+        <td>{{ vehicle.make }}</td>
+        <td>{{ vehicle.model }}</td>
+        <td>{{ vehicle.year }}</td>
+        <td>{{ vehicle.VIN }}</td>
+        <td>{{ vehicle.lastServiceDate | date }}</td>
+        <!-- this is for mileage if empty -->
+        <td>
+          <span
+            *ngIf="
+              vehicle.nextServiceMileage !== null &&
+                vehicle.nextServiceMileage !== undefined &&
+                vehicle.nextServiceMileage !== 0;
+              else noNext
+            "
+          >
+            {{ vehicle.nextServiceMileage | number }}
+          </span>
+          <ng-template #noNext>
+            <span class="badge bg-warning text-dark">No Next Service</span>
+          </ng-template>
+        </td>
+        <td>
+          <button class="btn btn-sm btn-outline-info" (click)="openMileageHistory(vehicle.VIN)">
+            View Mileage History
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <!-- Mileage History Modal -->
+  <div class="modal fade mileage-history-modal" tabindex="-1" aria-hidden="true" #historyModal>
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            Mileage History for {{ selectedVehicle?.make | uppercase }}
+            {{ selectedVehicle?.model | uppercase }}
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <!-- <th>Vehicle ID</th> -->
+                <th>Reading ID</th>
+                <th>Date</th>
+                <th>Mileage (km)</th>
+              </tr>
+            </thead>
+      <tbody class="table-body-fixed">
+              <tr *ngFor="let reading of mileageHistory">
+                <td>{{ reading.readingId }}</td>
+                <td>{{ reading.timestamp | date : 'mediumDate' }}</td>
+                <td>{{ reading.mileage }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div *ngIf="mileageHistory.length === 0" class="text-muted text-center">
+            No mileage history available for this vehicle.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<nav style="margin-top: 10px" aria-label="Page navigation" *ngIf="totalPages > 1">
+  <ul class="pagination justify-content-center">
+    <!-- Previous Button -->
+    <li class="page-item" [class.disabled]="currentPage === 1">
+      <a class="page-link" (click)="currentPage > 1 && (currentPage = currentPage - 1)">
+        Previous
+      </a>
+    </li>
+
+    <!-- Page Numbers -->
+    <li
+      class="page-item"
+      *ngFor="let page of [].constructor(totalPages); let i = index"
+      [class.active]="currentPage === i + 1"
+    >
+      <a class="page-link" (click)="currentPage = i + 1">
+        {{ i + 1 }}
+      </a>
+    </li>
+
+    <!-- Next Button -->
+    <li class="page-item" [class.disabled]="currentPage === totalPages">
+      <a class="page-link" (click)="currentPage < totalPages && (currentPage = currentPage + 1)">
+        Next
+      </a>
+    </li>
+  </ul>
+</nav>

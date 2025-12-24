@@ -1,0 +1,184 @@
+<app-universal-spinner [show]="loading"></app-universal-spinner>
+
+<section class="admin-panel" *ngIf="!loading">
+  <div class="header-row">
+    <h1>Service History Management</h1>
+  </div>
+
+  <form #adminForm="ngForm" (ngSubmit)="addRecord(adminForm)" class="admin-form">
+    <div class="form-group">
+      <label>Select VIN</label>
+      <select name="vehicleId" [(ngModel)]="newVehicleId" (change)="onVehicleSelect()" required>
+        <option value="">--Select VIN - ServiceID--</option>
+        <option *ngFor="let entry of dropdownEntries" [value]="entry.serviceId">
+          {{ entry.vin }}
+          <span *ngIf="!entry.isCompleted && !entry.isAlreadyInHistory"> (In Progress)</span>
+          <span *ngIf="entry.isCompleted && !entry.isAlreadyInHistory"> (Completed)</span>
+          <span *ngIf="entry.isAlreadyInHistory"> (In History)</span>
+        </option>
+      </select>
+
+      <label>Service Date</label>
+      <input
+        type="date"
+        name="date"
+        [(ngModel)]="newDate"
+        placeholder="Service Date"
+        readonly
+        required
+      />
+
+      <label>Technician Name</label>
+      <input
+        type="text"
+        name="technician"
+        [(ngModel)]="newTechnician"
+        placeholder="Technician Name"
+        readonly
+        required
+      />
+    </div>
+
+    <div class="form-group">
+      <label>Status</label>
+      <input
+        type="text"
+        name="status"
+        [(ngModel)]="newStatus"
+        placeholder="Status"
+        readonly
+        required
+      />
+
+      <label>Service Type</label>
+      <input
+        type="text"
+        name="type"
+        [(ngModel)]="newType"
+        placeholder="Service Type"
+        readonly
+        required
+      />
+
+      <label>Cost (₹)</label>
+      <input type="number" name="cost" [(ngModel)]="newCost" placeholder="Cost (₹)" required />
+
+      <button type="submit" [disabled]="adminForm.invalid">Add Record</button>
+    </div>
+  </form>
+
+  <!-- <div class="custom-modal-backdrop" *ngIf="showPaymentModal">
+    <div class="custom-modal">
+      <h2>Select Payment Method</h2>
+      <div class="payment-options">
+        <button (click)="selectPayment('Cash')">💵 Cash</button>
+      </div>
+      <button class="close-btn" (click)="closeModal()">Cancel</button>
+    </div>
+  </div> -->
+
+  <!-- <div class="custom-modal-backdrop" *ngIf="showCashModal">
+    <div class="custom-modal">
+      <h2>Cash Payment Details</h2>
+      <label>
+        <input type="checkbox" name="cashInHand" [(ngModel)]="cashInHand" />
+        Cash in hand
+      </label>
+      <select name="cashCollected" [(ngModel)]="cashCollected">
+        <option value="">-- Payment Collected? --</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+      <div class="payment-options">
+        <button (click)="confirmCashPayment()">Confirm Payment</button>
+      </div>
+      <button class="close-btn" (click)="closeModal()">Cancel</button>
+    </div>
+  </div> -->
+
+  <div class="record-table">
+    <h2>History Records</h2>
+    <div class="search-filter">
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="currentPage = 1"
+        placeholder="Search by Technician"
+        class="search-box"
+      />
+
+      <div class="sort-control">
+        <select
+          [(ngModel)]="sortOrder"
+          (change)="sortRecords(sortOrder); currentPage = 1"
+          class="sort-box"
+        >
+          <option value="">--Sort by Date--</option>
+          <option value="asc">Sort by Date Ascending</option>
+          <option value="desc">Sort by Date Descending</option>
+        </select>
+      </div>
+    </div>
+
+    <table *ngIf="filteredRecords.length > 0; else noRecords">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>VIN</th>
+          <th>Status</th>
+          <th>Service Type</th>
+          <th>Cost (₹)</th>
+          <th>Technician Name</th>
+          <th>Payment Status</th>
+        </tr>
+      </thead>
+      <tbody class="table-body-fixed">
+        <tr *ngFor="let r of filteredRecords">
+          <td>{{ r.date | date : 'yyyy-MM-dd' }}</td>
+          <td>{{ r.vehicleId }}</td>
+          <td>{{ r.status }}</td>
+          <td>{{ r.type }}</td>
+          <td>{{ r.cost }}</td>
+          <td>{{ r.technician }}</td>
+          <td>{{ r.paymentStatus }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <nav aria-label="Page navigation" *ngIf="totalPages > 1">
+      <ul class="pagination justify-content-center">
+        <!-- Previous Button -->
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <a class="page-link" (click)="currentPage > 1 && (currentPage = currentPage - 1)">
+            Previous
+          </a>
+        </li>
+
+        <!-- Page Numbers -->
+        <li
+          class="page-item"
+          *ngFor="let page of [].constructor(totalPages); let i = index"
+          [class.active]="currentPage === i + 1"
+        >
+          <a class="page-link" (click)="currentPage = i + 1">
+            {{ i + 1 }}
+          </a>
+        </li>
+
+        <!-- Next Button -->
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <a
+            class="page-link"
+            (click)="currentPage < totalPages && (currentPage = currentPage + 1)"
+          >
+            Next
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <ng-template #noRecords>
+      <p style="padding: 1rem; color: #888">No records found matching your search.</p>
+    </ng-template>
+  </div>
+</section>
